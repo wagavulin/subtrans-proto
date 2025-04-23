@@ -36,3 +36,31 @@ pipeline {
     }
 }
 ```
+
+```Dockerfile
+FROM jenkins/inbound-agent:latest
+
+USER root
+SHELL ["/bin/bash", "-c"]
+RUN apt-get update
+
+## pyenv
+#RUN apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+#RUN git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+#RUN echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+#RUN echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+#RUN echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+#RUN source ~/.bashrc && pyenv install 3.13.3
+
+## Miniconda
+RUN apt-get install -y wget
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+    sh Miniconda3-latest-Linux-x86_64.sh -b -p /opt/miniconda3 && \
+    rm -r Miniconda3-latest-Linux-x86_64.sh
+ENV PATH=/opt/miniconda3/bin:$PATH
+RUN conda create -n py313 python=3.13 -y
+RUN conda init
+RUN echo ". /opt/miniconda3/etc/profile.d/conda.sh" >> ~/.bashrc && echo "conda activate py313" >> ~/.bashrc
+SHELL ["/bin/bash", "-c"]
+RUN pip install matplotlib seaborn
+```
